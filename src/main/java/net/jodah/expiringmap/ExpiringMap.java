@@ -1,5 +1,8 @@
 package net.jodah.expiringmap;
 
+import net.jodah.expiringmap.internal.Assert;
+import net.jodah.expiringmap.internal.NamedThreadFactory;
+
 import java.lang.ref.WeakReference;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -13,8 +16,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -27,9 +30,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import net.jodah.expiringmap.internal.Assert;
-import net.jodah.expiringmap.internal.NamedThreadFactory;
 
 /**
  * A thread-safe map that expires entries. Optional features include expiration policies, variable entry expiration,
@@ -412,7 +412,7 @@ public class ExpiringMap<K, V> implements ConcurrentMap<K, V> {
   /** Entry TreeHashMap implementation for variable expiration ExpiringMap entries. */
   private static class EntryTreeHashMap<K, V> extends HashMap<K, ExpiringEntry<K, V>> implements EntryMap<K, V> {
     private static final long serialVersionUID = 1L;
-    SortedSet<ExpiringEntry<K, V>> sortedSet = new TreeSet<ExpiringEntry<K, V>>();
+    SortedSet<ExpiringEntry<K, V>> sortedSet = new ConcurrentSkipListSet<ExpiringEntry<K, V>>();
 
     @Override
     public void clear() {
